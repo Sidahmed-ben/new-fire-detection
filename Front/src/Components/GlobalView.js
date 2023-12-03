@@ -12,6 +12,8 @@ import User from "./User";
 import { Button } from "@mui/material";
 import FireCheckSwitch from "./FireCheckSwitch";
 // Render a YouTube video player
+import { render } from "@react-email/render";
+// import nodemailer from "nodemailer";
 
 const ItemVideo = styled(Paper)(({ theme }) => ({
   backgroundColor: "black",
@@ -96,7 +98,7 @@ export default function GlobalView() {
   async function checkFire() {
     try {
       // Call the function again after 3 seconds
-      // setfireCheckTO(setTimeout(checkFire, 5000));
+      setfireCheckTO(setTimeout(checkFire, 7000));
       console.log("This function is called every 5 seconds.");
       const response = await fetch("http://127.0.0.1:5000/api/check-fire");
       const result = await response.json();
@@ -119,7 +121,7 @@ export default function GlobalView() {
 
   function testButton() {
     console.log("clicked");
-    clearTimeout(fireCheckTO);
+    // clearTimeout(fireCheckTO);
   }
 
   return (
@@ -183,9 +185,16 @@ export default function GlobalView() {
           <User notifImage={notifImage} setNotifImage={setNotifImage}></User>
         </ItemRegister>
 
-        {/* <ItemRegister>
-          <Register></Register>
-        </ItemRegister> */}
+        <ItemRegister>
+          <button
+            onClick={() => {
+              testButton();
+            }}
+          >
+            {" "}
+            Click{" "}
+          </button>
+        </ItemRegister>
       </Grid>
     </StyledGrid>
   );

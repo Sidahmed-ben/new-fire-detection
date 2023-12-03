@@ -57,14 +57,25 @@ export default function User(props) {
       });
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
+  const deleteUser = async (userId) => {
+    const response = await fetch("http://127.0.0.1:5000/api/delete-user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userId }),
     });
+
+    if (response.ok) {
+      // Handle successful response
+      console.log("User deleted successfully");
+      getUsers();
+    } else {
+      // Handle error response
+      console.error("Error deleting user");
+    }
   };
+
   React.useEffect(() => {
     getUsers();
   }, []);
@@ -152,6 +163,9 @@ export default function User(props) {
                         size="small"
                         variant="outlined"
                         color="error"
+                        onClick={() => {
+                          deleteUser(user.id);
+                        }}
                       >
                         <DeleteIcon />
                       </Button>

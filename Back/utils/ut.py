@@ -20,4 +20,6 @@ def getFrameFromUrl(streamUrl):
     return frameRGB,frameToSave
 
 
-# saveFrameFromUrl("https://youtu.be/vHOv3sJWkUs")
+def read_image(file_path):
+    with open(file_path, 'rb') as f:
+        return f.read()

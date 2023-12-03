@@ -7,11 +7,12 @@ import Grid from "@mui/material/Grid";
 
 import ReactPlayer from "react-player";
 
-export default function VideoPlayer() {
+export default function VideoPlayer(props) {
+  const { videoUrl } = props;
   return (
     <ReactPlayer
       className="react-player"
-      url="https://www.youtube.com/watch?v=LXb3EKWsInQ"
+      url={videoUrl}
       width="100%"
       height="500px"
       controls

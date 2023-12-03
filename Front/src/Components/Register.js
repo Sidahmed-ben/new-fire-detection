@@ -9,13 +9,30 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 
 export default function Register() {
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+    const email = data.get("email");
+    const name = data.get("name");
+    if (email && name) {
+      const response = await fetch("http://127.0.0.1:5000/api/add-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email }),
+      });
+
+      if (response.ok) {
+        // Handle successful response
+        console.log("User added successfully");
+      } else {
+        // Handle error response
+        console.error("Error adding user");
+      }
+    } else {
+      console.log("Email or Name empty !");
+    }
   };
 
   return (
@@ -38,19 +55,16 @@ export default function Register() {
           label="Email Address"
           name="email"
           size="small"
-          // autoComplete="email"
-          // autoFocus
         />
         <TextField
           margin="normal"
           required
           fullWidth
-          name="Name"
+          name="name"
           label="Name"
           type="name"
           id="name"
           size="small"
-          // autoComplete="current-password"
         />
         <Button
           type="submit"

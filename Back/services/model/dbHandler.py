@@ -3,6 +3,11 @@ def createUserTableDB(db,user):
     db.session.query(user).delete()
     db.session.commit()
 
+def  createImageTableDB(db,imageTable):
+    db.create_all()
+    db.session.query(imageTable).delete()
+    db.session.commit()
+
 def addUserDB(db,user,name,email):
     new_row = user(name=name, email=email)
     db.session.add(new_row)
