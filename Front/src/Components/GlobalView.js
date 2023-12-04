@@ -13,6 +13,7 @@ import { Button } from "@mui/material";
 import FireCheckSwitch from "./FireCheckSwitch";
 // Render a YouTube video player
 import { render } from "@react-email/render";
+import ImageHist from "./ImageHist";
 // import nodemailer from "nodemailer";
 
 const ItemVideo = styled(Paper)(({ theme }) => ({
@@ -186,6 +187,12 @@ export default function GlobalView() {
         </ItemRegister>
 
         <ItemRegister>
+          <ImageHist
+            notifImage={notifImage}
+            setNotifImage={setNotifImage}
+          ></ImageHist>
+        </ItemRegister>
+        {/* <ItemRegister>
           <button
             onClick={() => {
               testButton();
@@ -194,7 +201,7 @@ export default function GlobalView() {
             {" "}
             Click{" "}
           </button>
-        </ItemRegister>
+        </ItemRegister> */}
       </Grid>
     </StyledGrid>
   );

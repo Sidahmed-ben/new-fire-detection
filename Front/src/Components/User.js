@@ -99,7 +99,11 @@ export default function User(props) {
 
       <Box component="form" autoComplete="off" noValidate>
         <Dialog fullWidth={true} open={open} onClose={handleClose}>
-          <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
+          <DialogTitle
+            style={{ color: "#023047", fontSize: "30px" }}
+            sx={{ m: 0, p: 2 }}
+            id="customized-dialog-title"
+          >
             User handling
           </DialogTitle>
           <IconButton

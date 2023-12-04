@@ -54,7 +54,8 @@ export default function Notification(props) {
   const handleCancel = () => {
     setNotifImage(null);
   };
-  const handleSendEmail = async () => {
+  const handleSendEmail = async (sendEmail) => {
+    setOpen(false);
     setNotifImage(null);
     const email = personEmail[0];
     const response = await fetch("http://127.0.0.1:5000/api/send-mail", {
@@ -62,7 +63,7 @@ export default function Notification(props) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ sendEmail, email }),
     });
 
     if (response.ok) {
@@ -98,8 +99,10 @@ export default function Notification(props) {
   };
 
   React.useEffect(() => {
-    getUsers();
-  }, []);
+    if (notifImage) {
+      handleClickOpen();
+    }
+  }, [notifImage]);
 
   return (
     <Container component="main" maxWidth="lg" style={{ minWidth: 400 }}>
@@ -120,7 +123,11 @@ export default function Notification(props) {
 
       <Box component="form" autoComplete="off" noValidate>
         <Dialog fullWidth={true} open={open} onClose={handleClose}>
-          <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
+          <DialogTitle
+            style={{ color: "#023047", fontSize: "30px" }}
+            sx={{ m: 0, p: 2 }}
+            id="customized-dialog-title"
+          >
             Notification
           </DialogTitle>
           <IconButton
@@ -140,48 +147,50 @@ export default function Notification(props) {
             style={{
               display: "flex",
               flexDirection: "column",
-              alignItems: "center",
+              // alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <div>
-              <FormControl sx={{ m: 1, width: 300 }}>
-                <InputLabel id="demo-multiple-name-label">Email</InputLabel>
-                <Select
-                  labelId="demo-multiple-name-label"
-                  id="demo-multiple-name"
-                  multiple
-                  value={personEmail}
-                  onChange={handleChange}
-                  input={<OutlinedInput label="Name" />}
-                  MenuProps={MenuProps}
-                >
-                  {usersList.map((user) => (
-                    <MenuItem
-                      key={user.id}
-                      value={user.email}
-                      style={getStyles(user.email, personEmail, theme)}
-                    >
-                      {user.email}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </div>
             {notifImage ? (
               <>
-                <Typography
-                  component="h1"
-                  variant="h3"
-                  style={{
-                    paddingTop: "8px",
-                    color: "#023047",
-                    fontSize: "30px",
-                    marginBottom: "20px",
-                  }}
-                >
-                  This image will be sended to the user :
-                </Typography>
+                <div>
+                  <Typography
+                    component="h1"
+                    variant="h3"
+                    style={{
+                      paddingTop: "8px",
+                      color: "#023047",
+                      fontSize: "20px",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    This image will be sended to the user :
+                  </Typography>
+                  <FormControl sx={{ mb: 7, width: 300 }}>
+                    <InputLabel id="demo-multiple-name-label">Email</InputLabel>
+                    <Select
+                      labelId="demo-multiple-name-label"
+                      id="demo-multiple-name"
+                      multiple
+                      value={personEmail}
+                      onChange={handleChange}
+                      input={<OutlinedInput label="Name" />}
+                      MenuProps={MenuProps}
+                      size="small"
+                    >
+                      {usersList.map((user) => (
+                        <MenuItem
+                          key={user.id}
+                          value={user.email}
+                          style={getStyles(user.email, personEmail, theme)}
+                        >
+                          {user.email}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </div>
+
                 <img
                   style={{ maxWidth: "100%", height: "auto" }}
                   src={notifImage}
@@ -204,13 +213,21 @@ export default function Notification(props) {
             )}
           </DialogContent>
           <DialogActions>
-            <Button autoFocus onClick={handleCancel}>
-              Do not send
-            </Button>
+            {notifImage && (
+              <>
+                <Button autoFocus onClick={() => handleSendEmail(false)}>
+                  Do not send
+                </Button>
 
-            <Button variant="contained" autoFocus onClick={handleSendEmail}>
-              Send
-            </Button>
+                <Button
+                  variant="contained"
+                  autoFocus
+                  onClick={() => handleSendEmail(true)}
+                >
+                  Send
+                </Button>
+              </>
+            )}
           </DialogActions>
         </Dialog>
       </Box>

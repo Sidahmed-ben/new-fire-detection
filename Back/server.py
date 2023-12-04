@@ -10,7 +10,7 @@ import cv2
 from flask_cors import CORS
 from flask_mail import Mail,Message
 import os
-from datetime import datetime
+from datetime import datetime,timedelta
 from sqlalchemy.orm import joinedload
 import base64
 
@@ -41,7 +41,7 @@ class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.LargeBinary)
     user_id = db.Column(db.Integer, nullable=True)
-    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    created_date = db.Column(db.DateTime,  default=lambda: datetime.utcnow() + timedelta(hours=1))
 
 
 # # Download Model
@@ -86,7 +86,7 @@ def get_images():
             'email': user.email
         } if user else None  # Si user est None, user_info est None
 
-        print(image.data)
+        # print(image.data)
         image_list.append({
             'id': image.id,
             'data': base64.b64encode(image.data).decode('utf-8'),
@@ -102,34 +102,49 @@ def get_images():
 def sendMail():
     body = request.get_json()
     email = body["email"]
-    # msg = Message("Hey", sender="noreply@demo.com", recipients=[email])     
+    sendEmail = body["sendEmail"]
+    user_id = None
+    # print(email)
+    # print(sendEmail)
 
-    # Create a message instance
-    msg = Message('Emergency Alert: Fire Detected', sender="FireDetection@demo.com",recipients=[email])
+    if(sendEmail):
+        user = User.query.filter_by(email=email).first()
+        user_id = user.id
+        # Create a message instance
+        msg = Message('Emergency Alert: Fire Detected', sender="FireDetection@demo.com",recipients=[email])
 
-    # Define the HTML content
-    html_content = """
-        <p>🔥 <strong>Emergency Alert: Fire Detected at Home</strong> 🔥</p>
-        <p>Dear Client </p>
-        <p>We regret to inform you that our fire detection system has identified a potential fire at your home. Your safety is our top priority, and immediate action is crucial.</p>
-        <ul>
-            <li><strong>Stay Calm:</strong> It's essential to remain calm. Take a deep breath.</li>
-            <li><strong>Evacuate Immediately:</strong> Exit the premises as quickly and safely as possible.</li>
-            <li><strong>Do Not Delay:</strong> Leave belongings behind; focus on your safety.</li>
-            <li><strong>Call Emergency Services:</strong> Dial your local emergency number (firefighter :18) to report the fire.</li>
-            <li><strong>Inform Neighbors:</strong> Alert nearby neighbors about the situation.</li>
-        </ul>
-        <p>Remember, your life is irreplaceable, and your safety is paramount. Our support team is coordinating with emergency services to address the situation.</p>
-        <p>Please stay safe,<br>{organization_name}</p>
-    """.format(organization_name='Fire Detection Team')
+        # Define the HTML content
+        html_content = """
+            <p>🔥 <strong>Emergency Alert: Fire Detected at Home</strong> 🔥</p>
+            <p>Dear Client </p>
+            <p>We regret to inform you that our fire detection system has identified a potential fire at your home. Your safety is our top priority, and immediate action is crucial.</p>
+            <ul>
+                <li><strong>Stay Calm:</strong> It's essential to remain calm. Take a deep breath.</li>
+                <li><strong>Evacuate Immediately:</strong> Exit the premises as quickly and safely as possible.</li>
+                <li><strong>Do Not Delay:</strong> Leave belongings behind; focus on your safety.</li>
+                <li><strong>Call Emergency Services:</strong> Dial your local emergency number (firefighter :18) to report the fire.</li>
+                <li><strong>Inform Neighbors:</strong> Alert nearby neighbors about the situation.</li>
+            </ul>
+            <p>Remember, your life is irreplaceable, and your safety is paramount. Our support team is coordinating with emergency services to address the situation.</p>
+            <p>Please stay safe,<br>{organization_name}</p>
+        """.format(organization_name='Fire Detection Team')
 
-        # Set the HTML content for the email
-    msg.html = render_template_string(html_content)
+            # Set the HTML content for the email
+        msg.html = render_template_string(html_content)
 
-      # Attach the image
-    with app.open_resource('capture/frame.jpg') as fp:
-        msg.attach('image.jpg', 'image/jpeg', fp.read(), 'inline', headers=[('Content-ID', '<image>')])
-    mail.send(msg)
+          # Attach the image
+        with app.open_resource('capture/frame.jpg') as fp:
+            msg.attach('image.jpg', 'image/jpeg', fp.read(), 'inline', headers=[('Content-ID', '<image>')])
+        mail.send(msg)
+
+    # Save image to Historic
+    file_path = './capture/frame.jpg'
+    image_data = read_image(file_path)
+    new_image = Image(data=image_data, user_id=user_id)
+    db.session.add(new_image)
+    db.session.commit()
+
+
     return '<h2>Mail sended successffully</h2>'
 
 
